@@ -6,7 +6,7 @@
 >You can find the following <strong>examples</strong> in this project.
 >> - ASP.NET Core 5
 >> - ASP.NET Core Identity
->> - EF Core Code First Approach
+>> - EF Core Code First approach
 >> - [Quill](https://quilljs.com/) rich text editor
 >> - Header with a navigation bar
 >> - Home page
