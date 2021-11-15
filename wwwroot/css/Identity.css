@@ -1,0 +1,10 @@
+@media all and (min-width: 480px) {
+    .identity {
+      padding: 60px 0;      
+    }
+  
+    .identity form {
+      margin: 0 auto;
+      max-width: 320px;
+    }
+  }
