@@ -1,4 +1,4 @@
-# Book Reviewer with ASP.NET Core 5 MVC
+# Book Reviewer with ASP.NET Core MVC
 [Book Reviewer with ASP.NET Core MVC](https://github.com/inthelamp/book-reviewer-aspnetcore) is another version of [Book Review](https://github.com/inthelamp/book-reviewer) and has been developed using ASP.NET Core MVC.
 
 ![alt text](https://github.com/inthelamp/book-reviewer-aspnetcore/blob/main/ReadReview.gif?raw=true "Home page")
