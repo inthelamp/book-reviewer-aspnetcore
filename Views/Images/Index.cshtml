@@ -13,9 +13,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ReviewId)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Subject)
             </th>
             <th>
@@ -28,7 +25,7 @@
                 @Html.DisplayNameFor(model => model.Size)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UploadedDate)
+                @Html.DisplayNameFor(model => model.CreateDate)
             </th>
             <th></th>
         </tr>
@@ -36,9 +33,6 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReviewId)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Subject)
             </td>
@@ -52,7 +46,7 @@
                 @Html.DisplayFor(modelItem => item.Size)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UploadedDate)
+                @Html.DisplayFor(modelItem => item.CreateDate)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

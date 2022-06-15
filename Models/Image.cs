@@ -10,23 +10,25 @@ namespace BookReviewer.Models
     /// </summary>    
     public class Image
     {
+        public Image ()
+        {
+            CreateDate = DateTime.Now;
+        }
+        
         [Key]
         public Guid Id { get; set; }
-
-        [ForeignKey("Review")]
-        public Guid ReviewId { get; set; } 
-
-        [StringLength(100)]
-        public string Subject { get; set; }
 
         [Display(Name = "Image Name")]
         [StringLength(100)]
         public string Name { get; set; }
 
+        [StringLength(100)]
+        public string Subject { get; set; }
+        
         [StringLength(500)]
         public string Note { get; set; }
 
-        [Display(Name = "Upload File")]
+        [Display(Name = "Image File")]
         [NotMapped]
         public IFormFile ImageFile { get; set; }
 
@@ -34,9 +36,11 @@ namespace BookReviewer.Models
         [DisplayFormat(DataFormatString = "{0:N0}")]
         public long Size { get; set; }
 
-        [Display(Name = "Upload Date")]
+        [Display(Name = "Create Date")]
         [DataType(DataType.Date)]
-        public DateTime UploadedDate { get; set; } 
+        public DateTime CreateDate { get; set; } 
 
+        public Guid ReviewId { get; set; }
+        public Review Review { get; set; }        
     }
 }

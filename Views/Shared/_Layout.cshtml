@@ -9,21 +9,21 @@
     <link rel="stylesheet" href="~/css/Header.css" />        
     <link rel="stylesheet" href="~/css/Identity.css" />       
     <link rel="stylesheet" href="~/css/RichText.css" />        
-     <link rel="stylesheet" href="~/css/Review.css" />           
+    <link rel="stylesheet" href="~/css/Review.css" />  
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light">
-            <div class="container">            
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
                 <div id="nav-title">
                     <img class="App-logo" src="~/images/logo.png" alt='Logo' asp-append-version="true"/>                          
                     <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Book Reviewer</a>
                 </div>
-                @* <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+@*                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-                </button> *@
-                @* <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -33,17 +33,18 @@
                         </li>
                     </ul>
                 </div> *@
-                <partial name="_LoginPartial" />
+                <partial name="_LoadingPartial" />  
+                <partial name="_LoginPartial" />               
             </div>
         </nav>
     </header>
     <div class="container">
-        <main role="main" class="App-body">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-0 mt-2">
+    <footer class="border-top footer text-muted">
         <div class="container">
             <img class='App-logo' src="~/images/logo.png" alt='Logo' /> &nbsp;Copyright &copy; 2021, IntheLamp - <a asp-area="" asp-controller="Home" asp-action="About">About</a>
         </div>

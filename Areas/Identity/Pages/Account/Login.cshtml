@@ -1,15 +1,16 @@
-@page
+﻿@page
 @model LoginModel
- 
+
 @{
     ViewData["Title"] = "Sign in";
 }
+<h1>@ViewData["Title"]</h1>
 
 <div class="identity">
     <form id="account" method="post">
         <h4>Sign in with Email</h4>
         <hr />
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="Input.Email"></label>
             <input asp-for="Input.Email" class="form-control" />
@@ -33,7 +34,7 @@
         </div>
     </form>
 </div>
- 
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

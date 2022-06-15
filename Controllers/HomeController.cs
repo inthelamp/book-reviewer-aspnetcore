@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using BookReviewer.Models;
+using BookReviewer.ViewModels;
 using BookReviewer.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -19,12 +16,12 @@ namespace BookReviewer.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly BookReviewerContext _context;
+        private readonly DefaultDBContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, BookReviewerContext context)
+        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, DefaultDBContext context)
         {
             _logger = logger;
             _context = context;            
@@ -33,32 +30,33 @@ namespace BookReviewer.Controllers
         }
 
         /// <summary>
-        /// Getting review subjects from book reviews which the user posted.
+        /// Gets review subjects from reviews which the user posted.
         /// </summary>  
-        private async Task<List<ReviewSubject>> getMyReviewSubjects()
+        private async Task<List<ReviewSubjectViewModel>> getMyReviewSubjects()
         {
             if (_signInManager.IsSignedIn(User))
             {
                 var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var reviews = _context.Review
-                                    .Where(re => re.UserId == userId)
-                                    .Select(re => new ReviewSubject() 
+                                    .Where(re => re.AuthorId == userId)
+                                    .OrderByDescending (re => re.UpdateDate)                                   
+                                    .Select(re => new ReviewSubjectViewModel() 
                                     { 
                                         Id = re.Id, 
-                                        Subject = re.Subject 
+                                        Subject = re.Subject
                                     });
                 
-                return await reviews.ToListAsync<ReviewSubject>();   
+                return await reviews.ToListAsync<ReviewSubjectViewModel>();   
 
             }
             return null;
         }
 
         /// <summary>
-        /// Getting review subjects from book reviews which the user didn't post.
+        /// Gets review subjects from reviews which the user didn't post.
         /// </summary>  
-        private async Task<List<ReviewSubject>> getReviewSubjects()
+        private async Task<List<ReviewSubjectViewModel>> getReviewSubjects()
         {
             // Excluding book reviews which the user posted.
             if (_signInManager.IsSignedIn(User))
@@ -66,31 +64,34 @@ namespace BookReviewer.Controllers
                 var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var reviews = _context.Review
-                                    .Where(re => re.UserId != userId)
-                                    .Select(re => new ReviewSubject() 
+                                    .Where(re => re.AuthorId != userId)
+                                    .OrderByDescending (re => re.UpdateDate)
+                                    .Select(re => new ReviewSubjectViewModel() 
                                     { 
                                         Id = re.Id, 
-                                        Subject = re.Subject 
-                                    });                
+                                        Subject = re.Subject
+                                    });  
 
-                return await reviews.ToListAsync<ReviewSubject>();
+                return await reviews.ToListAsync<ReviewSubjectViewModel>();
                 
             }                   
             else
             {
                 // Containing all book reviews               
                 var reviews = _context.Review
-                                    .Select(re => new ReviewSubject() 
+                                    .OrderByDescending (re => re.UpdateDate)                
+                                    .Select(re => new ReviewSubjectViewModel() 
                                     { 
                                         Id = re.Id, 
-                                        Subject = re.Subject 
+                                        Subject = re.Subject
                                     });
-                return await reviews.ToListAsync<ReviewSubject>();                    
+                return await reviews.ToListAsync<ReviewSubjectViewModel>();                    
             }
         }
 
         /// <summary>
-        /// GET: Getting and passing review subjects to the view using Dynamic Model.
+        /// GET: /
+        /// Gets review subjects and passes them to the view by using Dynamic Model.
         /// </summary>  
         [AllowAnonymous]
         public async Task<IActionResult> Index()
@@ -103,34 +104,29 @@ namespace BookReviewer.Controllers
             return View(dynamicReviews);
         }
 
-        // Showing if Read tab is clicked or not in the view
-        [TempData]
-        public bool IsReviewContentIn { get; set; }
-
         /// <summary>
-        /// GET: Getting review details by id and passing them to the view using TempData.
+        /// GET: Review?id=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        /// Gets review properties.
         /// </summary>  
         [AllowAnonymous]
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Review(Guid? id)
         {
             if (id == null)
             {
-                IsReviewContentIn = false;
                 return NotFound();
             }
 
             var review = await _context.Review.FindAsync(id);
             if (review == null)
             {
-                IsReviewContentIn = false;
                 return NotFound();
-            }
+            }            
 
-            IsReviewContentIn = true;
-            TempData.Put("review", review);
-            return RedirectToAction("Index");
-        }
-    
+            TempData.Put("Review", review);
+
+            return PartialView("_ContentPartial");
+        }        
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

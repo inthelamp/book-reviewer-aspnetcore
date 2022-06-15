@@ -1,0 +1,22 @@
+@model dynamic
+    
+<h4>My Review</h4>
+@if (Model != null)
+{                
+    <div class="scrollable">
+        <table class="table">
+            <tbody>
+        @foreach (var review in Model.MyReviewSubjects) {
+                <tr>
+                    <td class="subject">
+                        @review.Subject
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" onclick="onReadReview('@review.Id')">Read</button>                        
+                    </td>
+                </tr>
+        }
+            </tbody>
+        </table>
+    </div>
+}

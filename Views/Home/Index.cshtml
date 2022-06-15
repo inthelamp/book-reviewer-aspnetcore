@@ -1,9 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using BookReviewer.Models
-@using BookReviewer.Helpers
-@using System.Security.Claims
 @inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
 
 @{
     ViewData["Title"] = "Home";
@@ -14,36 +10,53 @@
         <div class="col-4 review" >
             @if (SignInManager.IsSignedIn(User))
             {   
-                <partial name="MyReviewPartial" />
+                await Html.RenderPartialAsync("_MyReviewPartial");
                 <br>
             }
-            <partial name="ReviewPartial" />   
+            @{
+                await Html.RenderPartialAsync("_ReviewPartial");
+            }            
         </div>
-        <div class="col-8 rich-text">
-            @if (TempData["IsReviewContentIn"] != null && (bool) TempData["IsReviewContentIn"])
-            {
-                // Getting review
-                var review = TempData.Get<Review>("review");
-
-                // Getting userId    
-                var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                // 
-                if (SignInManager.IsSignedIn(User) && review != null && review.UserId == userId)
-                {
-                    <partial name="ReviewEditPartial" />
-                }
-                else
-                {   
-                    <partial name="ReviewBrowsePartial" />
-                }
-            }
-            else
-            {
-                <partial name="ReviewDraftPartial" />
-            }      
+        <div id="ReviewContent" class="col-8 rich-text">
+            @{
+                await Html.RenderPartialAsync("_ContentPartial");
+            }        
         </div>
     </div>
 </div>
+@section Scripts {    
+    <script>
+        function onReadReview(reviewId) {
+            displayLoadingIndicator();      
 
+            $.ajax({
+                url: '@Url.Action("Review","Home")',
+                type: 'GET',
+                data: {id: reviewId},
 
+                // Refreshing Review Content only 
+                success: function (response) {
+                    hideLoadingIndicator();                    
+                    $('#ReviewContent').html(response);
+                },
+                error: function (response) {
+                    hideLoadingIndicator();                       
+                    alert(response.responseText);                 
+                }
+            });
+        } 
+
+        // Validation check for the content of the review
+        function isContentValid(quill) {
+            isValid = true;
+
+            const contentText = quill.getText().replace("\\n", "").trim();
+            if (contentText.length == 0){
+                isValid = false;
+                alert('There is no review to save.');
+            }
+
+            return isValid;
+        }                   
+    </script>
+}

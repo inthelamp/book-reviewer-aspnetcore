@@ -1,0 +1,63 @@
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager 
+
+<link href="~/lib/quill/quill.snow.css" rel="stylesheet">
+
+@using (Html.BeginForm("SaveDraft","Reviews",FormMethod.Post, new { onsubmit = "return getContent()" }))
+{
+    <div class="form-group">      
+      <input name="content" type="hidden">
+      <div id="quill-container" class="editor">
+      </div>
+    </div>
+    <div class="bottom-menu">
+      <button class="btn btn-primary" type="submit">Save Review</button>
+    </div>  
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/quill/quill.js"></script>
+
+<!-- Initialize Quill editor -->
+<script>
+var quill = new Quill('#quill-container', {
+    modules: {
+      toolbar: [
+          [{ header: [1, 2, 3, false] }],    
+          ['bold', 'italic', 'underline'],
+          ['blockquote', 'code-block'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ]
+    },
+    placeholder: 'Write a book review here...',
+    theme: 'snow'
+});
+
+// Getting review on submit
+function getContent() {
+    // Validation check for the content of the review
+    if (!isContentValid(quill)) {
+      return false;
+    }
+
+    var jsonStringContent = JSON.stringify(quill.getContents());    
+    var content = document.querySelector('input[name=content]');
+    content.value = jsonStringContent;      
+
+    @if (!SignInManager.IsSignedIn(User))
+    { 
+      <text>
+      var cookieValue = encodeURIComponent(jsonStringContent);
+      var length = cookieValue.length;
+      
+      // Checking the length of content because of the limit of the cookie length, 4096 bytes.  
+      if (length > 4000) {
+            alert('The size of review content including hidden control characters exceeds 4000 characters (' +  length + ' characters).');
+            return false;
+      }
+
+      document.cookie = "content=" + cookieValue;
+      </text>
+    }
+}
+</script>

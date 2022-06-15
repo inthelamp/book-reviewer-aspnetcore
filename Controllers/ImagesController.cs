@@ -12,9 +12,9 @@ namespace BookReviewer.Controllers
 {
     public class ImagesController : Controller
     {
-        private readonly BookReviewerContext _context;
+        private readonly DefaultDBContext _context;
 
-        public ImagesController(BookReviewerContext context)
+        public ImagesController(DefaultDBContext context)
         {
             _context = context;
         }
@@ -58,7 +58,7 @@ namespace BookReviewer.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(image);
+                _context.Image.Add(image);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -97,7 +97,6 @@ namespace BookReviewer.Controllers
             {
                 try
                 {
-                    _context.Update(image);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

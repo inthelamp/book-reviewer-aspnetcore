@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookReviewer.Models;
 using BookReviewer.Data;
@@ -12,9 +7,9 @@ namespace BookReviewer.Controllers
 {
     public class AuthorsController : Controller
     {
-        private readonly BookReviewerContext _context;
+        private readonly DefaultDBContext _context;
 
-        public AuthorsController(BookReviewerContext context)
+        public AuthorsController(DefaultDBContext context)
         {
             _context = context;
         }
@@ -26,7 +21,7 @@ namespace BookReviewer.Controllers
         }
 
         // GET: Authors/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
@@ -54,11 +49,11 @@ namespace BookReviewer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ReviewId,FirstName,MiddleName,LastName")] Author author)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,MiddleName,LastName")] Author author)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(author);
+                _context.Author.Add(author);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -86,7 +81,7 @@ namespace BookReviewer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,ReviewId,FirstName,MiddleName,LastName")] Author author)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,MiddleName,LastName")] Author author)
         {
             if (id != author.Id)
             {
@@ -97,7 +92,6 @@ namespace BookReviewer.Controllers
             {
                 try
                 {
-                    _context.Update(author);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -117,7 +111,7 @@ namespace BookReviewer.Controllers
         }
 
         // GET: Authors/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
@@ -137,7 +131,7 @@ namespace BookReviewer.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var author = await _context.Author.FindAsync(id);
             _context.Author.Remove(author);
@@ -145,9 +139,9 @@ namespace BookReviewer.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AuthorExists(Guid id)
+        private bool AuthorExists(string id)
         {
-            return _context.Author.Any(e => e.Id == id);
+            return _context.Author.Any(a => a.Id == id);
         }
     }
 }

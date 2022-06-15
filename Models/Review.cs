@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using BookReviewer.CustomValidation;
+using System.Text.Json.Serialization;
 
 namespace BookReviewer.Models
 {
@@ -17,16 +17,20 @@ namespace BookReviewer.Models
 
     /// <summary>
     /// Properties of book review to be posted by user.
-    /// </summary>   
+    /// </summary>    
+    [Index(nameof(IsbnNumber))]       
+    [Index(nameof(Status))]       
     public class Review
     {
+        public Review () 
+        {
+            CreateDate = DateTime.Now;
+            UpdateDate = DateTime.Now;
+        }    
+
         [Key]
         public Guid Id { get; set; }
 
-        [ForeignKey("User")]        
-        [StringLength(450)]
-        public string UserId { get; set; } 
-        
         [StringLength(100)]
         public string Subject { get; set; }
 
@@ -35,7 +39,8 @@ namespace BookReviewer.Models
         public string BookTitle { get; set; }
 
         [Display(Name = "Book Authors")]
-        public ICollection<Author> BookAuthors { get; set; }      
+        [StringLength(200)]
+        public string BookAuthors { get; set; }      
 
         [Display(Name = "ISBN Number")]
         public string IsbnNumber { get; set; }
@@ -43,19 +48,24 @@ namespace BookReviewer.Models
         [Display(Name = "Book Cover")]
         public byte[] BookCoverImage { get; set; }
 
-        public ICollection<Image> Images { get; set; }
-
-        //JSON serialize string of Quill
+        [Content]
         public string Content { get; set; }
 
         public ReviewStatus Status { get; set; }
 
         [Display(Name = "Create Date")]
         [DataType(DataType.Date)]
-        public DateTime CreatedDate { get; set; }        
+        public DateTime CreateDate { get; set; }        
 
         [Display(Name = "Update Date")]
-        [DataType(DataType.Date)]
-        public DateTime UpdatedDate { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime UpdateDate { get; set; } 
+
+        public string AuthorId { get; set; }
+        
+        [JsonIgnore] //Fixes JsonException: A possible object cycle was detected
+        public Author Author { get; set; }
+        
+        public List<Image> Images { get; set; }            
     }
 }

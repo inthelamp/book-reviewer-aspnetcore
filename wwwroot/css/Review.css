@@ -6,3 +6,9 @@
     max-height: 30vmin;
     overflow-y: auto;
 }
+
+.subject {
+    width: 35vmin;    
+    display: block;
+    word-wrap: break-word;
+}

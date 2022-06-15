@@ -2,10 +2,12 @@
     margin-top: 1vmin;
 }
 
-#quill-container {
-    width: 100%;
-    cursor: text;  
-    padding: 2vmin 3vmin;
+.top-menu {
+    margin-bottom: 0.5vmin;
+}
+
+.bottom-menu {
+    margin-top: 0.5vmin;
 }
 
 .editor {
@@ -16,6 +18,12 @@
 .browser {
     min-height: 30vmax;
     max-height: 46vmax;
+}
+
+#quill-container {
+    width: 100%;
+    cursor: text;  
+    padding: 2vmin 3vmin;
 }
 
 #quill-container .ql-editor {
