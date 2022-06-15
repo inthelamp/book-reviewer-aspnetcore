@@ -4,7 +4,7 @@
 ![alt text](https://github.com/inthelamp/book-reviewer-aspnetcore/blob/main/ReadReview.gif?raw=true "Home page")
 
 >You can find the following <strong>examples</strong> in this project.
->> - ASP.NET Core 5
+>> - ASP.NET Core 6
 >> - ASP.NET Core Identity
 >> - EF Core Code First approach
 >> - [Quill](https://quilljs.com/) rich text editor
