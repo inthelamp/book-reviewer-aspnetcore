@@ -38,24 +38,24 @@ namespace BookReviewer.Controllers
         }
 
         /// <summary>
-        /// Gets author 
+        /// Gets reviewer 
         /// </summary>  
-        private async Task<Author> getAuthor(string userId)
+        private async Task<Reviewer> getReviewer(string userId)
         {
-            var author = await _context.Author
+            var reviewer = await _context.Reviewer
                 .FirstOrDefaultAsync(a => a.Id == userId);
 
-            if (author == null)
+            if (reviewer == null)
             {
-                author = new Author();
-                author.Id = userId;
+                reviewer = new Reviewer();
+                reviewer.Id = userId;
 
-                // Saving Author
-                _context.Author.Add(author);
+                // Saving Reviewer
+                _context.Reviewer.Add(reviewer);
                 await _context.SaveChangesAsync();                
             }
 
-            return author;
+            return reviewer;
         }
 
         /// <summary>
@@ -66,10 +66,10 @@ namespace BookReviewer.Controllers
             ClaimsPrincipal currentUser = this.User;
             var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            if (string.IsNullOrEmpty(review.AuthorId)) 
+            if (string.IsNullOrEmpty(review.ReviewerId)) 
             {
-                Author author = await getAuthor(currentUserID);
-                review.AuthorId = author.Id;                    
+                Reviewer reviewer = await getReviewer(currentUserID);
+                review.Reviewer = reviewer;        
             }
 
             // Review properties
@@ -140,10 +140,10 @@ namespace BookReviewer.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]          
-        public async Task<IActionResult> Update(Guid id, string content)
+        public async Task<IActionResult> Update([FromForm] Review reviewUpdated)
         {
             var review = await _context.Review
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == reviewUpdated.Id);
 
             if (review == null)
             {
@@ -152,7 +152,78 @@ namespace BookReviewer.Controllers
                 return RedirectToAction("Index","Home");
             }                            
 
-            if (review.Content == content) 
+            bool isChanged = false;
+
+            if (review.Content != reviewUpdated.Content)
+            {
+                review.Content = reviewUpdated.Content;
+                isChanged = true;
+            }        
+
+            if (review.Subject != reviewUpdated.Subject) 
+            {
+                review.Subject = reviewUpdated.Subject;
+                isChanged = true;                
+            } 
+
+            if (review.BookTitle != reviewUpdated.BookTitle)
+            {
+                review.BookTitle = reviewUpdated.BookTitle;
+                isChanged = true;                  
+            }          
+                          
+            if (review.BookAuthors != reviewUpdated.BookAuthors) 
+            {
+                review.BookAuthors = reviewUpdated.BookAuthors;
+                isChanged = true;                 
+            } 
+
+            BookCover bookCover = null;   
+            var bookCoverFile = reviewUpdated.BookCoverFile;
+            if (bookCoverFile != null && bookCoverFile.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await bookCoverFile.CopyToAsync(memoryStream);
+
+                    // Uploading image with less than 2 MB
+                    if (memoryStream.Length < 2097152)
+                    {
+                        _context.Entry(review).Reference(b => b.BookCover).Load();
+                        if (review.BookCover != null) 
+                        {
+                            bookCover = review.BookCover;
+                            bookCover.Bytes = memoryStream.ToArray();
+                            bookCover.FileName = bookCoverFile.FileName;
+                            bookCover.FileExtension = Path.GetExtension(bookCoverFile.FileName);
+                            bookCover.Size = bookCoverFile.Length; 
+                        }    
+                        else 
+                        {
+                            // Creating Image instance.
+                            bookCover = new BookCover()
+                            {
+                                Bytes = memoryStream.ToArray(),
+                                FileName = bookCoverFile.FileName,
+                                FileExtension = Path.GetExtension(bookCoverFile.FileName),
+                                Size = bookCoverFile.Length, 
+                                Review = review                        
+                            };
+                                                        
+                            review.BookCover = bookCover;
+                            _context.BookCover.Add(bookCover);
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Image", "The image is too large to save.");
+                    }
+                }
+
+                isChanged = true;
+            }
+
+            if (!isChanged) 
             {
                 TempData.Put("Review", review);
                 Message = "No change is made.";                
@@ -160,13 +231,12 @@ namespace BookReviewer.Controllers
                 return RedirectToAction("Index","Home");
             } 
 
-            review.Content = content;
-
             // Checks the validation of the review for the content assigned
             if (TryValidateModel(review))
             {
-                review.UpdateDate = DateTime.Now;                
-                await save(review);            
+                review.UpdateDate = DateTime.Now;
+                               
+                await _context.SaveChangesAsync();
                 
                 Message = "The review is successfully updated.";          
             }
@@ -178,6 +248,23 @@ namespace BookReviewer.Controllers
             TempData.Put("Review", review);
             return RedirectToAction("Index","Home");
         }  
+
+        public async Task<IActionResult> GetBookCover(Guid id)
+        {
+            // fetch image data from database
+            var bookCover = await _context.BookCover
+                .FirstOrDefaultAsync(b => b.ReviewId == id);
+
+            if (bookCover != null) {
+                string imageType = "image/" + bookCover.FileExtension.Substring(1);
+                return  File(bookCover.Bytes, imageType);
+            } 
+            else
+            {
+                string defaultBookCover = "images/no_book_cover.png";
+                return File(defaultBookCover, "image/png");
+            }   
+        }
 
         [AllowAnonymous]
         // GET: Reviews

@@ -7,19 +7,19 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-4 review" >
+        <div class="col-4 review-list" >
             @if (SignInManager.IsSignedIn(User))
             {   
-                await Html.RenderPartialAsync("_MyReviewPartial");
+                await Html.RenderPartialAsync("_MyReviewListPartial");
                 <br>
             }
             @{
-                await Html.RenderPartialAsync("_ReviewPartial");
+                await Html.RenderPartialAsync("_ReviewListPartial");
             }            
         </div>
-        <div id="ReviewContent" class="col-8 rich-text">
+        <div id="ReviewContent" class="col-8 review">
             @{
-                await Html.RenderPartialAsync("_ContentPartial");
+                await Html.RenderPartialAsync("_ReviewPartial");
             }        
         </div>
     </div>
@@ -57,6 +57,6 @@
             }
 
             return isValid;
-        }                   
+        }                          
     </script>
 }

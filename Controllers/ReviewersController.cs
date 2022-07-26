@@ -5,22 +5,22 @@ using BookReviewer.Data;
 
 namespace BookReviewer.Controllers
 {
-    public class AuthorsController : Controller
+    public class ReviewersController : Controller
     {
         private readonly DefaultDBContext _context;
 
-        public AuthorsController(DefaultDBContext context)
+        public ReviewersController(DefaultDBContext context)
         {
             _context = context;
         }
 
-        // GET: Authors
+        // GET: Reviewers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Author.ToListAsync());
+            return View(await _context.Reviewer.ToListAsync());
         }
 
-        // GET: Authors/Details/5
+        // GET: Reviewers/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -28,39 +28,39 @@ namespace BookReviewer.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Author
+            var reviewer = await _context.Reviewer
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
+            if (reviewer == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(reviewer);
         }
 
-        // GET: Authors/Create
+        // GET: Reviewers/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Authors/Create
+        // POST: Reviewers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,MiddleName,LastName")] Author author)
+        public async Task<IActionResult> Create([Bind("Id,FirstName,MiddleName,LastName")] Reviewer reviewer)
         {
             if (ModelState.IsValid)
             {
-                _context.Author.Add(author);
+                _context.Reviewer.Add(reviewer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            return View(reviewer);
         }
 
-        // GET: Authors/Edit/5
+        // GET: Reviewers/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -68,22 +68,22 @@ namespace BookReviewer.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Author.FindAsync(id);
-            if (author == null)
+            var reviewer = await _context.Reviewer.FindAsync(id);
+            if (reviewer == null)
             {
                 return NotFound();
             }
-            return View(author);
+            return View(reviewer);
         }
 
-        // POST: Authors/Edit/5
+        // POST: Reviewers/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,MiddleName,LastName")] Author author)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,FirstName,MiddleName,LastName")] Reviewer reviewer)
         {
-            if (id != author.Id)
+            if (id != reviewer.Id)
             {
                 return NotFound();
             }
@@ -96,7 +96,7 @@ namespace BookReviewer.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AuthorExists(author.Id))
+                    if (!ReviewerExists(reviewer.Id))
                     {
                         return NotFound();
                     }
@@ -107,10 +107,10 @@ namespace BookReviewer.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(author);
+            return View(reviewer);
         }
 
-        // GET: Authors/Delete/5
+        // GET: Reviewers/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -118,30 +118,30 @@ namespace BookReviewer.Controllers
                 return NotFound();
             }
 
-            var author = await _context.Author
+            var reviewer = await _context.Reviewer
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (author == null)
+            if (reviewer == null)
             {
                 return NotFound();
             }
 
-            return View(author);
+            return View(reviewer);
         }
 
-        // POST: Authors/Delete/5
+        // POST: Reviewers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var author = await _context.Author.FindAsync(id);
-            _context.Author.Remove(author);
+            var reviewer = await _context.Reviewer.FindAsync(id);
+            _context.Reviewer.Remove(reviewer);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AuthorExists(string id)
+        private bool ReviewerExists(string id)
         {
-            return _context.Author.Any(a => a.Id == id);
+            return _context.Reviewer.Any(a => a.Id == id);
         }
     }
 }

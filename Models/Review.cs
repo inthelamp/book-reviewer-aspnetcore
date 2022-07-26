@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using BookReviewer.CustomValidation;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BookReviewer.Models
 {
@@ -46,7 +48,11 @@ namespace BookReviewer.Models
         public string IsbnNumber { get; set; }
 
         [Display(Name = "Book Cover")]
-        public byte[] BookCoverImage { get; set; }
+        [JsonIgnore]
+        public BookCover BookCover { get; set; }
+
+        [NotMapped]
+        public IFormFile BookCoverFile { get; set; }
 
         [Content]
         public string Content { get; set; }
@@ -61,11 +67,15 @@ namespace BookReviewer.Models
         [DataType(DataType.DateTime)]
         public DateTime UpdateDate { get; set; } 
 
-        public string AuthorId { get; set; }
+        public string ReviewerId { get; set; }
         
+        [ForeignKey("ReviewerId")]
         [JsonIgnore] //Fixes JsonException: A possible object cycle was detected
-        public Author Author { get; set; }
+        public Reviewer Reviewer { get; set; }
         
-        public List<Image> Images { get; set; }            
+        public List<Image> Images { get; set; }         
+
+        [NotMapped]
+        public IFormFileCollection ImageFiles { get; set; }
     }
 }

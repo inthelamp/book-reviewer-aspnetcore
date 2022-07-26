@@ -1,22 +1,32 @@
-@model dynamic
-    
-<h4>Review</h4>
-@if (Model != null)
-{
-    <div class="scrollable">
-        <table class="table">
-            <tbody>
-        @foreach (var review in Model.ReviewSubjects) {
-                <tr>
-                    <td class="subject">
-                        @review.Subject
-                    </td>
-                    <td>
-                        <button class="btn btn-primary" onclick="onReadReview('@review.Id')">Read</button>
-                    </td>
-                </tr>
-        }
-            </tbody>
-        </table>
-    </div>
+@using Microsoft.AspNetCore.Identity
+@using BookReviewer.Helpers
+@using System.Security.Claims
+@inject SignInManager<IdentityUser> SignInManager
+
+@if (TempData["Message"] != null){
+    await Html.RenderPartialAsync("_MessagePartial");
 }
+ 
+@if (TempData.Peek<Review>("Review") != null)
+{   
+    <div class="top-menu">
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">New Review</a>
+    </div>
+
+    var review = TempData.Get<Review>("Review");
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    // 
+    if (SignInManager.IsSignedIn(User) && review != null && review.ReviewerId == userId)
+    {
+        await Html.RenderPartialAsync("_ReviewEditPartial");      
+    }
+    else
+    {   
+        await Html.RenderPartialAsync("_ReviewBrowsePartial");                       
+    }
+}
+else
+{
+    await Html.RenderPartialAsync("_ReviewDraftPartial");
+} 

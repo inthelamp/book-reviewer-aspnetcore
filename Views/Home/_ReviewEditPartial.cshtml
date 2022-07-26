@@ -1,0 +1,116 @@
+@using BookReviewer.Models
+@using BookReviewer.Helpers
+@using System.Security.Claims
+
+<link href="~/lib/quill/quill.snow.css" rel="stylesheet">
+
+@using (Html.BeginForm("Update", "Reviews", FormMethod.Post, new { enctype="multipart/form-data", onsubmit="return getContent()" }))
+{   
+    var review = TempData.Get<Review>("Review");
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);     
+
+    if (review != null && review.ReviewerId == userId)
+    {
+        <div class="form-group">    
+            @{var content = review.Content;}
+            <input type="hidden" name="Id" value="@review.Id">
+            <input type="hidden" id="content" name="Content" value="@content">
+            <div class="row review-detail">    
+                <div class="col-md-2 book-cover">       
+                    <label for="book_cover_input">  
+                        <img id="book_cover_image" src='@Url.Action("GetBookCover", "Reviews", new { id = review.Id })' asp-append-version="true"> 
+                    </label> 
+                    <input id="book_cover_input" type="file"  name="BookCoverFile" onchange="loadBookCover(event)">
+                </div>
+                <div class="col-md-10">
+                    <div class="row review-text">
+                        <div class="col-md-2">
+                            <label for="subject">Subject</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" id="subject" name="Subject" value="@review.Subject">
+                        </div>                
+                    </div>
+                    <div class="row review-text">
+                        <div class="col-md-2">
+                            <label for="book-title">Book Title</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" id="book-title" name="BookTitle" value="@review.BookTitle">
+                        </div>                
+                    </div>         
+                    <div class="row review-text">
+                        <div class="col-md-2">
+                            <label for="isbn">ISBN</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" id="isbn" name="IsbnNumber" value="@review.IsbnNumber">
+                        </div>                
+                    </div>               
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label for="book-authors">Book Authors</label>
+                        </div>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" id="book-authors" name="BookAuthors" value="@review.BookAuthors">
+                        </div>               
+                    </div>  
+                </div>
+            </div>              
+            <div class="editor" id="quill-container">
+            </div>  
+        </div>    
+        <div class="bottom-menu">
+            <button class="btn btn-primary" type="submit">Save Review</button>
+        </div>          
+    }   
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/quill/quill.js"></script>
+<!-- Load Book Cover Image  -->
+<script>
+    function loadBookCover(event) {
+        var bookCoverImage = document.getElementById('book_cover_image');
+        bookCoverImage.src = URL.createObjectURL(event.target.files[0]);
+    }
+</script>
+
+<!-- Initialize Quill editor -->
+<script> 
+$(document).ready(function () {
+    setContent();     
+});
+
+var quill = new Quill('#quill-container', {
+    modules: {
+        toolbar: [
+            [{ header: [1, 2, 3, false] }],    
+            ['bold', 'italic', 'underline'],
+            ['blockquote', 'code-block', 'image'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ]
+    },        
+    placeholder: 'Write a book review here...',
+    theme: 'snow'
+});
+
+// Populating review retrieved
+function setContent() {
+    var content = $("#content").val();
+    var delta = JSON.parse(content);
+    quill.setContents(delta, 'silent');  
+}
+
+// Getting review on submit
+function getContent() {
+    // Validation check for the content of the review
+    if (!isContentValid(quill)) {
+      return false;
+    }
+
+    var jsonStringContent = JSON.stringify(quill.getContents());
+    var content = document.querySelector('#content');      
+    content.value = jsonStringContent;
+}
+</script>

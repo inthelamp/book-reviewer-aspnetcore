@@ -10,8 +10,9 @@ namespace BookReviewer.Data
         {
         }
 
-        public DbSet<BookReviewer.Models.Author> Author { get; set; }
+        public DbSet<BookReviewer.Models.Reviewer> Reviewer { get; set; }
 
+        public DbSet<BookReviewer.Models.BookCover> BookCover { get; set; }
         public DbSet<BookReviewer.Models.Image> Image { get; set; }
 
         public DbSet<BookReviewer.Models.Review> Review { get; set; }    
@@ -20,15 +21,21 @@ namespace BookReviewer.Data
         {
             // One to many relationship.
             modelBuilder.Entity<Review>()
-                .HasOne(r => r.Author)
+                .HasOne(r => r.Reviewer)
                 .WithMany(a => a.Reviews)
-                .HasForeignKey(r => r.AuthorId);       
+                .HasForeignKey(r => r.ReviewerId); 
+
+            // One to one relationship
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.BookCover)
+                .WithOne(b => b.Review)
+                .HasForeignKey<BookCover>(b => b.ReviewId);                  
 
             // One to many relationship.
             modelBuilder.Entity<Image>()
                 .HasOne(i => i.Review)
                 .WithMany(r => r.Images)
-                .HasForeignKey(i => i.ReviewId);
+                .HasForeignKey(i => i.ReviewId);      
         }
     }
 }

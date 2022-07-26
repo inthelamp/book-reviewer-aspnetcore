@@ -39,7 +39,7 @@ namespace BookReviewer.Controllers
                 var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var reviews = _context.Review
-                                    .Where(re => re.AuthorId == userId)
+                                    .Where(re => re.ReviewerId == userId)
                                     .OrderByDescending (re => re.UpdateDate)                                   
                                     .Select(re => new ReviewSubjectViewModel() 
                                     { 
@@ -64,7 +64,7 @@ namespace BookReviewer.Controllers
                 var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var reviews = _context.Review
-                                    .Where(re => re.AuthorId != userId)
+                                    .Where(re => re.ReviewerId != userId)
                                     .OrderByDescending (re => re.UpdateDate)
                                     .Select(re => new ReviewSubjectViewModel() 
                                     { 
@@ -124,7 +124,7 @@ namespace BookReviewer.Controllers
 
             TempData.Put("Review", review);
 
-            return PartialView("_ContentPartial");
+            return PartialView("_ReviewPartial");
         }        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

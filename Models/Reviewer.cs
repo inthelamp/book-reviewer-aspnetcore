@@ -7,7 +7,7 @@ namespace BookReviewer.Models
     /// Properties of book author.
     /// </summary>
 
-    public class Author
+    public class Reviewer
     {
         /// <summary>
         /// Id is UserId from User.

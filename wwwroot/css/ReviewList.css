@@ -1,0 +1,13 @@
+.review-list {
+    margin-top: 1vmin;
+}
+
+.subject {
+    width: 35vmin;    
+    word-wrap: break-word;
+}
+
+.scrollable {
+    max-height: 30vmin;
+    overflow-y: auto;
+}

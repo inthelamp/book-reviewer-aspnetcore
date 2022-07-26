@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Http;
 namespace BookReviewer.Models
 {
     /// <summary>
-    /// Properties of image to be uploaded.
+    /// Properties of BookCover to be uploaded.
     /// </summary>    
-    public class Image
+    public class BookCover
     {
-        public Image ()
+        public BookCover ()
         {
             CreateDate = DateTime.Now;
         }
@@ -24,9 +24,6 @@ namespace BookReviewer.Models
 
         public byte[] Bytes { get; set; }
 
-        [StringLength(500)]
-        public string Description { get; set; }
-
         public string FileExtension { get; set; }
         
         public decimal Size { get; set; }
@@ -38,6 +35,6 @@ namespace BookReviewer.Models
         public Guid ReviewId { get; set; }
 
         [ForeignKey("ReviewId")]
-        public Review Review { get; set; }        
+        public Review Review { get; set; }  
     }
 }

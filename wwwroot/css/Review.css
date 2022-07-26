@@ -2,13 +2,67 @@
     margin-top: 1vmin;
 }
 
-.scrollable {
-    max-height: 30vmin;
-    overflow-y: auto;
+.review-text {
+    margin-bottom: 1vmin;
 }
 
-.subject {
-    width: 35vmin;    
-    display: block;
-    word-wrap: break-word;
+.review-detail {
+    margin-left: 0.1vmin;
+    margin-bottom: 1vmin;
+}
+
+.book-cover {
+    border: thin solid #a9b3ee;
+    padding: 0;
+}
+
+.book-cover > label {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;    
+}
+
+.book-cover > label > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-cover > input {
+    display: none;
+}
+
+.top-menu {
+    margin-bottom: 0.5vmin;
+}
+
+.bottom-menu {
+    margin-top: 0.5vmin;
+}
+
+.right-menu {
+    padding: 0 !important;
+}
+
+.editor {
+    min-height: 30vmax;
+    max-height: 95%;
+    height: auto !important;
+}
+
+.browser {
+    min-height: 30vmax;
+    max-height: 46vmax;
+}
+
+#quill-container {
+    width: 100%;
+    cursor: text;  
+    padding: 2vmin 3vmin;
+}
+
+#quill-container .ql-editor {
+    font-family: "Times New Roman", sans-serif;
+    font-size: 18px;
+    overflow-y: auto; 
 }
