@@ -12,3 +12,4 @@
 >> - Home page
 >> - Dynamic model
 >> - Partial views
+>> - Storing images in DB
