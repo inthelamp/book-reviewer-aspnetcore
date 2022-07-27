@@ -11,16 +11,18 @@
 
     if (review != null && review.ReviewerId == userId)
     {
-        <div class="form-group">    
-            @{var content = review.Content;}
+        var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = review.Id });
+        var content = review.Content;   
+
+        <div class="form-group">
             <input type="hidden" name="Id" value="@review.Id">
             <input type="hidden" id="content" name="Content" value="@content">
             <div class="row review-detail">    
                 <div class="col-md-2 book-cover">       
                     <label for="book_cover_input">  
-                        <img id="book_cover_image" src='@Url.Action("GetBookCover", "Reviews", new { id = review.Id })' asp-append-version="true"> 
+                        <img id="book_cover_image" src="@bookCoverUrl" asp-append-version="true"> 
                     </label> 
-                    <input id="book_cover_input" type="file"  name="BookCoverFile" onchange="loadBookCover(event)">
+                    <input id="book_cover_input" type="file" name="BookCoverFile" onchange="loadBookCover(event)">
                 </div>
                 <div class="col-md-10">
                     <div class="row review-text">

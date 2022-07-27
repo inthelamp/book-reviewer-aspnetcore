@@ -54,7 +54,7 @@ namespace BookReviewer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Subject,Name,Note,Size,UploadedDate")] Image image)
+        public async Task<IActionResult> Create([Bind("Id,FileName,Bytes,Description,Size,CreateDate")] Image image)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace BookReviewer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,ReviewId,Subject,Name,Note,Size,UploadedDate")] Image image)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,FileName,Bytes,Description,Size,CreateDate")] Image image)
         {
             if (id != image.Id)
             {

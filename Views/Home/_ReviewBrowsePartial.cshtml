@@ -7,7 +7,48 @@
     var review = TempData.Get<Review>("Review");
     if (review != null)
     {
-        var content = review.Content;
+        var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = review.Id });        
+        var content = review.Content;        
+        
+        <div class="row review-detail">    
+            <div class="col-md-2 book-cover">       
+                <img src="@bookCoverUrl"  asp-append-version="true">
+            </div>
+            <div class="col-md-10">
+                <div class="row review-text">
+                    <div class="col-md-2">
+                        Subject:
+                    </div>
+                    <div class="col-md-10">
+                        @review.Subject
+                    </div>                
+                </div>
+                <div class="row review-text">
+                    <div class="col-md-2">
+                        Book Title:
+                    </div>
+                    <div class="col-md-10">
+                        @review.BookTitle
+                    </div>                
+                </div>         
+                <div class="row review-text">
+                    <div class="col-md-2">
+                        ISBN:
+                    </div>
+                    <div class="col-md-10">
+                        @review.IsbnNumber
+                    </div>                
+                </div>               
+                <div class="row">
+                    <div class="col-md-2">
+                        Book Authors:
+                    </div>
+                    <div class="col-md-10">
+                        @review.BookAuthors
+                    </div>               
+                </div>  
+            </div>
+        </div>           
         <input id="hiddenContent" name="content" type="hidden" value="@content">
         <div id="quill-container" class="browser">
         </div> 

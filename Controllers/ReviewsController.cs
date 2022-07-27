@@ -249,23 +249,6 @@ namespace BookReviewer.Controllers
             return RedirectToAction("Index","Home");
         }  
 
-        public async Task<IActionResult> GetBookCover(Guid id)
-        {
-            // fetch image data from database
-            var bookCover = await _context.BookCover
-                .FirstOrDefaultAsync(b => b.ReviewId == id);
-
-            if (bookCover != null) {
-                string imageType = "image/" + bookCover.FileExtension.Substring(1);
-                return  File(bookCover.Bytes, imageType);
-            } 
-            else
-            {
-                string defaultBookCover = "images/no_book_cover.png";
-                return File(defaultBookCover, "image/png");
-            }   
-        }
-
         [AllowAnonymous]
         // GET: Reviews
         public async Task<IActionResult> Index()
@@ -319,7 +302,7 @@ namespace BookReviewer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Subject,BookTitle,IsbnNumber,BookCoverImage,Status,CreatedDate,UpdatedDate")] Review review)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Subject,BookTitle,IsbnNumber,BookCover,Status,CreatedDate,UpdatedDate")] Review review)
         {
             if (id != review.Id)
             {
