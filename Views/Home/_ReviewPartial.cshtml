@@ -9,14 +9,18 @@
  
 @if (TempData.Peek<Review>("Review") != null)
 {   
+    var review = TempData.Get<Review>("Review");
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);       
+
     <div class="top-menu">
         <a class="btn btn-primary" asp-controller="Home" asp-action="Index">New Review</a>
+
+        @if (SignInManager.IsSignedIn(User) && review != null && review.ReviewerId == userId)
+        {
+            <a class="btn btn-warning" asp-controller="Reviews" asp-action="Delete" asp-route-id="@review.Id">Delete</a>
+        }
     </div>
 
-    var review = TempData.Get<Review>("Review");
-    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-    // 
     if (SignInManager.IsSignedIn(User) && review != null && review.ReviewerId == userId)
     {
         await Html.RenderPartialAsync("_ReviewEditPartial");      

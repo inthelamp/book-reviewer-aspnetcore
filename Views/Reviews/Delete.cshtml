@@ -1,22 +1,23 @@
 @model BookReviewer.Models.Review
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = Model.Subject;
+
+    var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = Model.Id });
 }
 
-<h1>Delete</h1>
+<h1>@ViewData["Title"]</h1>
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>Review</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subject)
+            @Html.DisplayNameFor(model => model.BookCover)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subject)
-        </dd>
+        <dd class = "col-sm-10 book-cover">
+            <img id="book_cover_image" src="@bookCoverUrl" asp-append-version="true"> 
+        </dd>        
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.BookTitle)
         </dt>
@@ -24,23 +25,23 @@
             @Html.DisplayFor(model => model.BookTitle)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BookAuthors)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.BookAuthors)
+        </dd>         
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.IsbnNumber)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.IsbnNumber)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BookCover)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BookCover)
-        </dd>
-        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Status)
-        </dd>
+        </dd>      
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CreateDate)
         </dt>
@@ -52,12 +53,38 @@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.UpdateDate)
-        </dd>
+        </dd>     
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Content)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.HiddenFor(model => model.Content)
+            <div id="quill-container-simple"></div>    
+        </dd>          
     </dl>
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="GetMyReviews">Back to List</a>
     </form>
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/quill/quill.js"></script>
+
+<!-- Initialize read only Quill editor -->
+<script> 
+$(document).ready(function () {
+    var quill = new Quill('#quill-container-simple', {
+        modules: {
+            toolbar: false
+        },
+        readOnly: true,  
+        theme: 'snow'
+    });   
+    var content = $("#Content").val();
+    var delta = JSON.parse(content);        
+    quill.setContents(delta, 'silent'); 
+});    
+</script>

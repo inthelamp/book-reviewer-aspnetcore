@@ -26,6 +26,17 @@
     object-fit:fill;
 }
 
+.book-cover-icon img {
+    width: 1em;
+    height: 1.3em;
+    object-fit:fill;
+}
+
+.book-cover-icon > a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .book-cover > input {
     display: none;
 }
@@ -42,11 +53,6 @@
     padding: 0 !important;
 }
 
-.editor {
-    min-height: 30vmax;
-    max-height: 95%;
-    height: auto !important;
-}
 
 .browser {
     min-height: 30vmax;
@@ -59,8 +65,29 @@
     padding: 2vmin 3vmin;
 }
 
-#quill-container .ql-editor {
+.editor {
+    min-height: 30vmax;
+    max-height: 95%;
+    height: auto !important;
+}
+
+.editor-edit {
+    max-height: 95%;
+    height: auto !important;
+}
+
+#quill-container-simple {
+    width: 100%;
+    height: auto;
+    cursor: text;  
+}
+
+.ql-editor {
     font-family: "Times New Roman", sans-serif;
     font-size: 18px;
     overflow-y: auto; 
+}
+
+.ql-clipboard {
+    display: none;
 }

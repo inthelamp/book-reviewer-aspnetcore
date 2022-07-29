@@ -1,68 +1,110 @@
 @model BookReviewer.Models.Review
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "New Review";
+
+    var selectListOfStatuses = new SelectList(Enum.GetValues<ReviewStatus>());
 }
 
-<h1>Create</h1>
+<link href="~/lib/quill/quill.snow.css" rel="stylesheet">
 
-<h4>Review</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+<h1>@ViewData["Title"]</h1>
+
+@using (Html.BeginForm("Create", "Reviews", FormMethod.Post, new { enctype="multipart/form-data", onsubmit="return getContent()" }))
+{
+    @Html.Hidden("Content")      
+    <div class="row">
+        <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
+            <div class="form-group book-cover">
+                <label asp-for="BookCoverFile">                          
+                    <img id="book_cover_image" src="~/images/no_book_cover.png">
+                </label>
+                <input asp-for="BookCoverFile" type="file" onchange="loadBookCover(event)">                
+            </div>        
+            <br>              
             <div class="form-group">
                 <label asp-for="Subject" class="control-label"></label>
                 <input asp-for="Subject" class="form-control" />
                 <span asp-validation-for="Subject" class="text-danger"></span>
             </div>
+            <br>
             <div class="form-group">
                 <label asp-for="BookTitle" class="control-label"></label>
                 <input asp-for="BookTitle" class="form-control" />
                 <span asp-validation-for="BookTitle" class="text-danger"></span>
             </div>
+            <br>
+            <div class="form-group">
+                <label asp-for="BookAuthors" class="control-label"></label>
+                <input asp-for="BookAuthors" class="form-control" />
+                <span asp-validation-for="BookAuthors" class="text-danger"></span>
+            </div>    
+            <br>        
             <div class="form-group">
                 <label asp-for="IsbnNumber" class="control-label"></label>
                 <input asp-for="IsbnNumber" class="form-control" />
                 <span asp-validation-for="IsbnNumber" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="BookCover" class="control-label"></label>
-                <input asp-for="BookCover" class="form-control" />
-                <span asp-validation-for="BookCover" class="text-danger"></span>
-            </div>
+            <br>
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
+                <select asp-for="Status" asp-items="@selectListOfStatuses" class="form-control"></select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CreateDate" class="control-label"></label>
-                <input asp-for="CreateDate" class="form-control" />
-                <span asp-validation-for="CreateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdateDate" class="control-label"></label>
-                <input asp-for="UpdateDate" class="form-control" />
-                <span asp-validation-for="UpdateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+    <br>
+    <div class="form-group editor-edit" id="quill-container"></div>
+    <div class="bottom-menu">
+        <button class="btn btn-primary" type="submit">Create</button>
+    </div>      
+}
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="GetMyReviews">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartialQuill");}     
 }
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/quill/quill.js"></script>
+
+<!-- Load Book Cover Image  -->
+<script>
+    function loadBookCover(event) {
+        var bookCoverImage = document.getElementById('book_cover_image');
+        bookCoverImage.src = URL.createObjectURL(event.target.files[0]);
+    }
+</script>
+
+<!-- Initialize Quill editor -->
+<script> 
+var quill = new Quill('#quill-container', {
+    modules: {
+        toolbar: [
+            [{ header: [1, 2, 3, false] }],    
+            ['bold', 'italic', 'underline'],
+            ['blockquote', 'code-block', 'image'],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ]
+    },        
+    placeholder: 'Write a book review here...',
+    theme: 'snow'
+});
+
+// Getting review on submit
+function getContent() {
+    // Validation check for the content of the review
+    if (!isContentValid(quill)) {
+      return false;
+    }
+
+    var jsonStringContent = JSON.stringify(quill.getContents());
+    var content = document.querySelector('#Content');      
+    content.value = jsonStringContent;
+}
+</script>

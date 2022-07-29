@@ -11,7 +11,7 @@ namespace BookReviewer.Controllers
     public class ReviewsController : Controller
     {
         private readonly DefaultDBContext _context;
-        private readonly IConfiguration _configuration;        
+        private readonly IConfiguration _configuration;      
 
         public ReviewsController(DefaultDBContext context, IConfiguration configuration)
         {
@@ -21,6 +21,39 @@ namespace BookReviewer.Controllers
 
         [TempData]
         public string Message { get; set; }
+
+        // GET: Reviews
+        /// <summary>
+        /// Gets the reviews published
+        /// </summary>  
+        [AllowAnonymous]
+        public async Task<IActionResult> GetReviews()
+        {
+            var reviews = await _context.Review
+                        .Where(r => r.Status == ReviewStatus.Published) 
+                        .ToListAsync();
+
+            ViewBag.Menu = "Reviews";
+            return View("Index", reviews);
+        }
+
+
+        // GET: Reviews
+        /// <summary>
+        /// Gets the reviews the user wrote
+        /// </summary>  
+        public async Task<IActionResult> GetMyReviews()
+        {            
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+        
+            var myReviews = await _context.Review
+                        .Where(r => r.ReviewerId == userId) 
+                        .ToListAsync();
+
+            ViewBag.Menu = "My Reviews";
+            return View("Index", myReviews);
+        }        
               
         /// <summary>
         /// Creates a subject because there is no subject assigned to the draft version of review.
@@ -63,13 +96,12 @@ namespace BookReviewer.Controllers
         /// </summary>  
         private async Task save(Review review)
         {
-            ClaimsPrincipal currentUser = this.User;
-            var currentUserID = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-
             if (string.IsNullOrEmpty(review.ReviewerId)) 
-            {
-                Reviewer reviewer = await getReviewer(currentUserID);
-                review.Reviewer = reviewer;        
+            {                
+                ClaimsPrincipal currentUser = this.User;
+                string userId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;       
+
+                review.Reviewer = await getReviewer(userId);     
             }
 
             // Review properties
@@ -117,7 +149,7 @@ namespace BookReviewer.Controllers
         /// </summary>  
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveDraft(string content, [Bind("Content")] Review review)
+        public async Task<IActionResult> SaveDraft([Bind("Content")] Review review)
         {
             if (ModelState.IsValid)
             {
@@ -140,8 +172,13 @@ namespace BookReviewer.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]          
-        public async Task<IActionResult> Update([FromForm] Review reviewUpdated)
+        public async Task<IActionResult> Update(Guid id, [FromForm] Review reviewUpdated)
         {
+            if (id != reviewUpdated.Id)
+            {
+                return NotFound();
+            }
+
             var review = await _context.Review
                 .FirstOrDefaultAsync(m => m.Id == reviewUpdated.Id);
 
@@ -216,7 +253,7 @@ namespace BookReviewer.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError("Image", "The image is too large to save.");
+                        ModelState.AddModelError("BookCover", "The image is too large to save.");
                     }
                 }
 
@@ -249,33 +286,98 @@ namespace BookReviewer.Controllers
             return RedirectToAction("Index","Home");
         }  
 
-        [AllowAnonymous]
-        // GET: Reviews
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Review.ToListAsync());
-        }
-
         // GET: Reviews/Create
         public IActionResult Create()
         {
             return View();
         }         
 
+        // POST: Reviews/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Subject,BookTitle,BookAuthors,IsbnNumber,Content,Status,BookCoverFile")] Review review)
+        {
+            if (ModelState.IsValid)
+            {
+                BookCover bookCover = null;   
+                var bookCoverFile = review.BookCoverFile;
+                if (bookCoverFile != null && bookCoverFile.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await bookCoverFile.CopyToAsync(memoryStream);
+
+                        // Uploading image with less than 2 MB
+                        if (memoryStream.Length < 2097152)
+                        {
+                            // Creating Image instance.
+                            bookCover = new BookCover()
+                            {
+                                Bytes = memoryStream.ToArray(),
+                                FileName = bookCoverFile.FileName,
+                                FileExtension = Path.GetExtension(bookCoverFile.FileName),
+                                Size = bookCoverFile.Length, 
+                                Review = review                        
+                            };
+                                                        
+                            review.BookCover = bookCover;
+                            _context.BookCover.Add(bookCover);
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("BookCover", "The image is too large to save.");
+                        }
+                    }
+                }
+
+                ClaimsPrincipal currentUser = this.User;
+                string userId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                review.Reviewer = await getReviewer(userId);
+                _context.Review.Add(review);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(GetMyReviews));
+            }
+            return View(review);
+        }    
+
         // GET: Reviews/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(Guid? id, string menu)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index","Home");
             }
 
-            var review = await _context.Review
-                .FirstOrDefaultAsync(m => m.Id == id);
+            Review review = null;
+            if (menu == "My Reviews")
+            {
+                ClaimsPrincipal currentUser = this.User;
+                if (currentUser.Identity.IsAuthenticated)
+                {
+                    string userId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                    review = await _context.Review
+                        .FirstOrDefaultAsync(m => m.Id == id && m.ReviewerId == userId);
+
+                    ViewBag.Menu = "My Reviews";
+                }
+            }
+            else
+            {
+                review = await _context.Review
+                    .FirstOrDefaultAsync(m => m.Id == id);
+
+                 ViewBag.Menu = "Reviews";
+            }
 
             if (review == null)
             {
-                return NotFound();
+                return RedirectToAction("Index","Home");
             }
 
             return View(review);
@@ -302,18 +404,109 @@ namespace BookReviewer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Subject,BookTitle,IsbnNumber,BookCover,Status,CreatedDate,UpdatedDate")] Review review)
+        public async Task<IActionResult> Edit(Guid id, [FromForm] Review reviewUpdated)
         {
-            if (id != review.Id)
+            if (id != reviewUpdated.Id)
             {
                 return NotFound();
             }
 
+            var review = await _context.Review
+                .FirstOrDefaultAsync(m => m.Id == reviewUpdated.Id);    
+
             if (ModelState.IsValid)
             {
+                bool isChanged = false;
+
+                if (reviewUpdated.Content != null && review.Content != reviewUpdated.Content)
+                {
+                    review.Content = reviewUpdated.Content;
+                    isChanged = true;
+                }        
+
+                if (reviewUpdated.Subject != null && review.Subject != reviewUpdated.Subject) 
+                {
+                    review.Subject = reviewUpdated.Subject;
+                    isChanged = true;                
+                } 
+
+                if (reviewUpdated.BookTitle != null && review.BookTitle != reviewUpdated.BookTitle)
+                {
+                    review.BookTitle = reviewUpdated.BookTitle;
+                    isChanged = true;                  
+                }          
+                            
+                if (reviewUpdated.BookAuthors != null && review.BookAuthors != reviewUpdated.BookAuthors) 
+                {
+                    review.BookAuthors = reviewUpdated.BookAuthors;
+                    isChanged = true;                 
+                } 
+
+                if (review.Status != reviewUpdated.Status) 
+                {
+                    review.Status = reviewUpdated.Status;
+                    isChanged = true;                 
+                }                 
+
+                BookCover bookCover = null;   
+                var bookCoverFile = reviewUpdated.BookCoverFile;
+                if (bookCoverFile != null && bookCoverFile.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await bookCoverFile.CopyToAsync(memoryStream);
+
+                        // Uploading image with less than 2 MB
+                        if (memoryStream.Length < 2097152)
+                        {
+                            _context.Entry(review).Reference(b => b.BookCover).Load();
+                            if (review.BookCover != null) 
+                            {
+                                bookCover = review.BookCover;
+                                bookCover.Bytes = memoryStream.ToArray();
+                                bookCover.FileName = bookCoverFile.FileName;
+                                bookCover.FileExtension = Path.GetExtension(bookCoverFile.FileName);
+                                bookCover.Size = bookCoverFile.Length; 
+                            }    
+                            else 
+                            {
+                                // Creating Image instance.
+                                bookCover = new BookCover()
+                                {
+                                    Bytes = memoryStream.ToArray(),
+                                    FileName = bookCoverFile.FileName,
+                                    FileExtension = Path.GetExtension(bookCoverFile.FileName),
+                                    Size = bookCoverFile.Length, 
+                                    Review = review                        
+                                };
+                                                            
+                                review.BookCover = bookCover;
+                                _context.BookCover.Add(bookCover);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("BookCover", "The image is too large to save.");
+                        }
+                    }
+
+                    isChanged = true;
+                }
+
+                if (!isChanged) 
+                {
+                    Message = "No change is made.";                
+
+                    return View(reviewUpdated);
+                } 
+
                 try
                 {
+                    review.UpdateDate = DateTime.Now;
+                                
                     await _context.SaveChangesAsync();
+                    
+                    Message = "The review is successfully updated.";                          
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -326,9 +519,9 @@ namespace BookReviewer.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(GetMyReviews));
             }
-            return View(review);
+            return View(reviewUpdated);
         }
 
         // GET: Reviews/Delete/5
@@ -359,7 +552,7 @@ namespace BookReviewer.Controllers
             _context.Review.Remove(review);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(GetMyReviews));
         }
 
         private bool ReviewExists(Guid id)

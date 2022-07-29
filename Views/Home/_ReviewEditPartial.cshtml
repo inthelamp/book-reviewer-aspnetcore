@@ -12,11 +12,10 @@
     if (review != null && review.ReviewerId == userId)
     {
         var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = review.Id });
-        var content = review.Content;   
 
         <div class="form-group">
-            <input type="hidden" name="Id" value="@review.Id">
-            <input type="hidden" id="content" name="Content" value="@content">
+            @Html.Hidden("Id", review.Id)
+            @Html.Hidden("Content", review.Content)            
             <div class="row review-detail">    
                 <div class="col-md-2 book-cover">       
                     <label for="book_cover_input">  
@@ -59,8 +58,7 @@
                     </div>  
                 </div>
             </div>              
-            <div class="editor" id="quill-container">
-            </div>  
+            <div class="editor" id="quill-container"></div>  
         </div>    
         <div class="bottom-menu">
             <button class="btn btn-primary" type="submit">Save Review</button>
@@ -99,7 +97,7 @@ var quill = new Quill('#quill-container', {
 
 // Populating review retrieved
 function setContent() {
-    var content = $("#content").val();
+    var content = $("#Content").val();
     var delta = JSON.parse(content);
     quill.setContents(delta, 'silent');  
 }
@@ -112,7 +110,7 @@ function getContent() {
     }
 
     var jsonStringContent = JSON.stringify(quill.getContents());
-    var content = document.querySelector('#content');      
+    var content = document.querySelector('#Content');      
     content.value = jsonStringContent;
 }
 </script>

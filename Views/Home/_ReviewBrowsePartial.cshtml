@@ -7,8 +7,7 @@
     var review = TempData.Get<Review>("Review");
     if (review != null)
     {
-        var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = review.Id });        
-        var content = review.Content;        
+        var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = review.Id });  
         
         <div class="row review-detail">    
             <div class="col-md-2 book-cover">       
@@ -49,12 +48,10 @@
                 </div>  
             </div>
         </div>           
-        <input id="hiddenContent" name="content" type="hidden" value="@content">
-        <div id="quill-container" class="browser">
-        </div> 
+        @Html.Hidden("Content", review.Content)
+        <div id="quill-container" class="browser"></div> 
     }    
 }
-
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/quill/quill.js"></script>
@@ -69,7 +66,7 @@ $(document).ready(function () {
         readOnly: true,  
         theme: 'snow'
     });   
-    var content = $("#hiddenContent").val();
+    var content = $("#Content").val();
     var delta = JSON.parse(content);
     quill.setContents(delta, 'silent');          
 });    

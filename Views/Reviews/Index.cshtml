@@ -1,17 +1,22 @@
 @model IEnumerable<BookReviewer.Models.Review>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = ViewBag.Menu;       
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (ViewBag.Menu == "My Reviews")
+{
+    <br>
+    <p>
+        <a asp-action="Create">Create New Review</a>
+    </p>
+}
+
 <table class="table">
     <thead>
-        <tr>
+        <tr>      
             <th>
                 @Html.DisplayNameFor(model => model.Subject)
             </th>
@@ -19,52 +24,75 @@
                 @Html.DisplayNameFor(model => model.BookTitle)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.BookAuthors)
+            </th>            
+            <th>
                 @Html.DisplayNameFor(model => model.IsbnNumber)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BookCover)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreateDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdateDate)
-            </th>
-            <th></th>
+
+            @if (ViewBag.Menu == "My Reviews")            
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UpdateDate)
+                </th>               
+            }
+            else
+            {
+                <th>
+                    @("Published Date")
+                </th>
+            }
+
+            @if (ViewBag.Menu == "My Reviews")
+            {
+                <th></th>
+            }
+
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
+@foreach (var item in Model) 
+{
+    var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = item.Id }); 
+        <tr>          
+            <td class = "book-cover-icon">
+                <a asp-action="Details" asp-route-id="@item.Id" asp-route-menu="@ViewBag.Menu">              
+                <img src="@bookCoverUrl" asp-append-version="true">                 
                 @Html.DisplayFor(modelItem => item.Subject)
+                </a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.BookTitle)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.BookAuthors)
+            </td>            
+            <td>
                 @Html.DisplayFor(modelItem => item.IsbnNumber)
             </td>
+
+            @if (ViewBag.Menu == "My Reviews")            
+            {            
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+            }
+
             <td>
-                @Html.DisplayFor(modelItem => item.BookCover)
+                @item.UpdateDate.ToString("d")
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdateDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
+
+            @if (ViewBag.Menu == "My Reviews")
+            {            
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>        
+            }   
+
         </tr>
 }
     </tbody>

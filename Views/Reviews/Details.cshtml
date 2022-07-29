@@ -1,21 +1,22 @@
 @model BookReviewer.Models.Review
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Subject;
+
+    var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = Model.Id });
 }
 
-<h1>Details</h1>
+<h1>@ViewData["Title"]</h1>
 
 <div>
-    <h4>Review</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subject)
+            @Html.DisplayNameFor(model => model.BookCover)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subject)
-        </dd>
+        <dd class = "col-sm-10 book-cover">
+            <img id="book_cover_image" src="@bookCoverUrl" asp-append-version="true"> 
+        </dd>        
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.BookTitle)
         </dt>
@@ -23,38 +24,86 @@
             @Html.DisplayFor(model => model.BookTitle)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BookAuthors)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.BookAuthors)
+        </dd>        
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.IsbnNumber)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.IsbnNumber)
         </dd>
+
+        @if (ViewBag.Menu == "My Reviews") 
+        {           
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.Status)
+            </dd>             
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.CreateDate)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.CreateDate)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.UpdateDate)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.UpdateDate)
+            </dd>     
+        }    
+        else
+        {
+            <dt class = "col-sm-2">
+                @("Published Date")
+            </dt>
+            <dd class = "col-sm-10">
+               @Model.UpdateDate.ToString("d")
+            </dd>     
+        }
+
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BookCover)
+            @Html.DisplayNameFor(model => model.Content)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BookCover)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreateDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdateDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdateDate)
-        </dd>
+            @Html.HiddenFor(model => model.Content)
+            <div id="quill-container-simple"></div> 
+        </dd>          
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (ViewBag.Menu == "My Reviews") 
+    {   
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> 
+        @("|")
+        <a asp-action="GetMyReviews">Back to List</a>
+    }
+    else
+    {
+        <a asp-action="GetReviews">Back to List</a>
+    }
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/quill/quill.js"></script>
+
+<!-- Initialize read only Quill editor -->
+<script> 
+$(document).ready(function () {
+    var quill = new Quill('#quill-container-simple', {
+        modules: {
+            toolbar: false
+        },
+        readOnly: true,  
+        theme: 'snow'
+    });   
+    var content = $("#Content").val();
+    var delta = JSON.parse(content);        
+    quill.setContents(delta, 'silent'); 
+});    
+</script>

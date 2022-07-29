@@ -1,0 +1,14 @@
+// Validation check for the content of the review
+<script>
+    function isContentValid(quill) {
+        isValid = true;
+
+        const contentText = quill.getText().replace("\\n", "").trim();
+        if (contentText.length == 0){
+            isValid = false;
+            alert('There is no review to save.');
+        }
+
+        return isValid;
+    }
+</script>
