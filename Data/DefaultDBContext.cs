@@ -11,11 +11,10 @@ namespace BookReviewer.Data
         }
 
         public DbSet<BookReviewer.Models.Reviewer> Reviewer { get; set; }
-
         public DbSet<BookReviewer.Models.BookCover> BookCover { get; set; }
         public DbSet<BookReviewer.Models.Image> Image { get; set; }
-
         public DbSet<BookReviewer.Models.Review> Review { get; set; }    
+        public DbSet<BookReviewer.Models.Feedback> Feedback { get; set; }          
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +35,12 @@ namespace BookReviewer.Data
                 .HasOne(i => i.Review)
                 .WithMany(r => r.Images)
                 .HasForeignKey(i => i.ReviewId);      
+
+            // One to many relationship.
+            modelBuilder.Entity<Feedback>()
+                .HasOne(f => f.Review)
+                .WithMany(r => r.Feedbacks)
+                .HasForeignKey(f => f.ReviewId);                  
         }
     }
 }

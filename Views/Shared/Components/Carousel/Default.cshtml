@@ -1,0 +1,57 @@
+@model IEnumerable<BookReviewer.Models.Image>
+
+@if (Model.Count() > 0)
+{
+  <hr>
+  <div id="default_carousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      @for (int i=0; i < Model.Count(); ++i)
+      {
+          @if (i == 0)
+          {
+            <button type="button" data-bs-target="#default_carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>                    
+          }
+          else
+          {
+            <button type="button" data-bs-target="#default_carousel" data-bs-slide-to="@i" aria-label='"Slide" + " @i+1"' ></button>                            
+          }              
+      }
+    </ol>
+    <div class="carousel-inner">
+      @foreach (var item in Model)
+      {
+          @if (item == Model.First())
+          {
+              <div class="carousel-item active">
+                  <img class="d-block w-100" src='@Url.Action("GetImage", "Images", new { id = item.Id })'>
+                  <div class="carousel-caption">
+                    <p>
+                      @item.Description
+                    </p> 
+                  </div>
+              </div>
+          }
+          else
+          {
+              <div class="carousel-item">
+                  <img class="d-block w-100" src='@Url.Action("GetImage", "Images", new { id = item.Id })'>
+                  <div class="carousel-caption">
+                    <p>
+                      @item.Description
+                    </p> 
+                  </div>                    
+              </div>       
+          }
+      }      
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#default_carousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#default_carousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+  <hr>
+}

@@ -1,0 +1,14 @@
+@model IEnumerable<BookReviewer.Models.Feedback>
+    
+<hr>
+<div>
+    <h4>@Model.Count() comments</h4>
+</div>
+<hr>
+@foreach (var item in Model)
+{
+    <p>
+        @Html.DisplayFor(modelItem => item.Comment)        
+    </p>
+    <hr>
+}   

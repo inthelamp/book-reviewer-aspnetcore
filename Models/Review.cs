@@ -77,5 +77,7 @@ namespace BookReviewer.Models
 
         [NotMapped]
         public IFormFileCollection ImageFiles { get; set; }
+
+        public List<Feedback> Feedbacks { get; set; }
     }
 }

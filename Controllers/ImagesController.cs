@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookReviewer.Models;
 using BookReviewer.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookReviewer.Controllers
 {
@@ -18,6 +19,23 @@ namespace BookReviewer.Controllers
         {
             _context = context;
         }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> GetImage(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // fetch image data from database
+            var image = await _context.Image
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            string imageType = "image/" + image.FileExtension.Substring(1);
+            return  File(image.Bytes, imageType);
+        }        
 
         // GET: Images
         public async Task<IActionResult> Index()
@@ -50,20 +68,63 @@ namespace BookReviewer.Controllers
         }
 
         // POST: Images/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FileName,Bytes,Description,Size,CreateDate")] Image image)
+        public async Task<IActionResult> Create(Guid reviewId, string description, string menu, IFormFile imageFile)
         {
-            if (ModelState.IsValid)
+            var review = await _context.Review
+                .FirstOrDefaultAsync(m => m.Id == reviewId);
+
+            Image image = null;   
+            if (imageFile != null && imageFile.Length > 0)
             {
-                _context.Image.Add(image);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+                using (var memoryStream = new MemoryStream())
+                {
+                    await imageFile.CopyToAsync(memoryStream);
+
+                    // Uploading image with less than 2 MB
+                    if (memoryStream.Length < 2097152)
+                    {
+                        // Creating Image instance.
+                        image = new Image()
+                        {
+                            Bytes = memoryStream.ToArray(),
+                            Description = description,
+                            FileName = imageFile.FileName,
+                            FileExtension = Path.GetExtension(imageFile.FileName),
+                            Size = imageFile.Length, 
+                            Review = review                        
+                        };
+                                                
+                        _context.Image.Add(image);
+                        await _context.SaveChangesAsync();
+
+                        return RedirectToAction("Details", "Reviews", new { id = reviewId, menu = menu});                 
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("BookCover", "The image is too large to save.");
+                    }
+                }
+            }            
+
             return View(image);
-        }
+        }        
+
+        // POST: Images/Create
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> Create([Bind("FileName,Bytes,Description,Size,CreateDate")] Image image)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         _context.Image.Add(image);
+        //         await _context.SaveChangesAsync();
+        //         return RedirectToAction(nameof(Index));
+        //     }
+        //     return View(image);
+        // }
 
         // GET: Images/Edit/5
         public async Task<IActionResult> Edit(Guid? id)

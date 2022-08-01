@@ -21,6 +21,10 @@
         }
     </div>
 
+    <div>
+        @await Component.InvokeAsync("Carousel", new { reviewId = @review.Id, menu = "Home" })
+    </div>   
+
     if (SignInManager.IsSignedIn(User) && review != null && review.ReviewerId == userId)
     {
         await Html.RenderPartialAsync("_ReviewEditPartial");      
@@ -29,6 +33,9 @@
     {   
         await Html.RenderPartialAsync("_ReviewBrowsePartial");                       
     }
+    <div>
+        @await Component.InvokeAsync("FeedbackList", new { reviewId = @review.Id, menu = "Home" })
+    </div>    
 }
 else
 {

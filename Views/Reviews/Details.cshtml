@@ -7,7 +7,9 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-
+<div>
+    @await Component.InvokeAsync("Carousel", new { reviewId = @Model.Id, menu = @ViewBag.Menu })
+</div>
 <div>
     <hr />
     <dl class="row">
@@ -87,6 +89,9 @@
     {
         <a asp-action="GetReviews">Back to List</a>
     }
+</div>
+<div>
+    @await Component.InvokeAsync("FeedbackList", new { reviewId = @Model.Id, menu = ViewBag.Menu })
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>

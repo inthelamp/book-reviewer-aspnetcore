@@ -1,0 +1,26 @@
+.display-off {
+    display: none;
+}
+
+.display-on {
+    display: block;
+}
+
+.book-image > label { 
+    cursor: pointer;
+}
+
+.book-image img {
+    border: thin solid #a9b3ee;
+    width: 100%;
+    height: auto;
+    object-fit:fill;
+}
+
+.book-image > input {
+    display: none;
+}
+
+#default_carousel {
+    width: 50%;
+}
