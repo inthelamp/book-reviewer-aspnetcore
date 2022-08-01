@@ -64,7 +64,7 @@ namespace BookReviewer.Controllers
                 var userId =  User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var reviews = _context.Review
-                                    .Where(re => re.ReviewerId != userId)
+                                    .Where(re => re.ReviewerId != userId && re.Status == ReviewStatus.Published)
                                     .OrderByDescending (re => re.UpdateDate)
                                     .Select(re => new ReviewSubjectViewModel() 
                                     { 
@@ -77,8 +77,9 @@ namespace BookReviewer.Controllers
             }                   
             else
             {
-                // Containing all book reviews               
+                // Containing all book reviews published              
                 var reviews = _context.Review
+                                    .Where(re => re.Status == ReviewStatus.Published)
                                     .OrderByDescending (re => re.UpdateDate)                
                                     .Select(re => new ReviewSubjectViewModel() 
                                     { 
