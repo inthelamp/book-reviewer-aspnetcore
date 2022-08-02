@@ -22,6 +22,30 @@ namespace BookReviewer.Controllers
         [TempData]
         public string Message { get; set; }
 
+        /// <summary>
+        /// Change status of the review 
+        /// </summary>  
+        public async Task<IActionResult> ChangeStatus(Guid? id, ReviewStatus status)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var review = await _context.Review.FindAsync(id);
+            if (review == null)
+            {
+                return NotFound();
+            }
+      
+            review.Status = status;
+            await _context.SaveChangesAsync();
+
+            TempData.Put("Review", review);     
+
+            return RedirectToAction("Index","Home");
+        }
+
         // GET: Reviews
         /// <summary>
         /// Gets the reviews published
@@ -141,7 +165,7 @@ namespace BookReviewer.Controllers
             }            
 
             return RedirectToAction("Index","Home");
-        }            
+        }          
 
         /// <summary>
         /// POST: /Reviews/SaveDraft

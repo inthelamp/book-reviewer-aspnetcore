@@ -18,6 +18,15 @@
         @if (SignInManager.IsSignedIn(User) && review != null && review.ReviewerId == userId)
         {
             <a class="btn btn-warning" asp-controller="Reviews" asp-action="Delete" asp-route-id="@review.Id">Delete</a>
+
+            if (review.Status == ReviewStatus.Draft)
+            {
+                <a class="btn btn-info" asp-controller="Reviews" asp-action="ChangeStatus" asp-route-id="@review.Id" asp-route-status="@ReviewStatus.Published">Publish</a>
+            } 
+            else 
+            {
+                <a class="btn btn-info" asp-controller="Reviews" asp-action="ChangeStatus" asp-route-id="@review.Id" asp-route-status="@ReviewStatus.Draft">Unpublish</a>
+            }
         }
     </div>
 
