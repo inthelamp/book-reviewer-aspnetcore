@@ -6,7 +6,16 @@
     var bookCoverUrl = Url.Action("GetBookCover", "BookCovers", new { reviewId = Model.Id });
 }
 
-<h1>@ViewData["Title"]</h1>
+
+<h1>@ViewData["Title"]</h1> 
+
+@if (Model.Status == ReviewStatus.Published)
+{
+    <div id="social-media-details">
+        @await Component.InvokeAsync("SocialMedia", new { reviewId = @Model.Id })
+    </div>
+}
+
 <div>
     @await Component.InvokeAsync("Carousel", new { reviewId = @Model.Id, menu = @ViewBag.Menu })
 </div>

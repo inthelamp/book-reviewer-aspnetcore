@@ -1,0 +1,50 @@
+a.btn-social {    
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    line-height: 30px;
+    margin: 4px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: #f0f0f0;
+    overflow: hidden;
+    padding: 0px;
+}
+
+a.btn-social:hover {
+    text-decoration: none;
+}
+
+a.btn-social.default-button {
+    background-color: #3b5998;
+}
+
+a.btn-social.default-button:hover {
+    background-color: #8d747f;
+}
+
+a.btn-social.twitter-button {
+    background-color: #4099ff;
+}
+
+a.btn-social.twitter-button:hover {
+    background-color: #8d747f;
+}
+
+a.btn-social.googleplus-button {
+    background-color: #dd4b39;
+}
+
+a.btn-social.googleplus-button:hover {
+    background-color: #8d747f;
+}
+
+a.btn-social.reddit-button {
+    background-color: #FF4500;
+    font-size: 10px;
+}
+
+a.btn-social.reddit-button:hover {
+    background-color: #8d747f;
+}

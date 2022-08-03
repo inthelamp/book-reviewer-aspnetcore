@@ -28,6 +28,12 @@
                 <a class="btn btn-info" asp-controller="Reviews" asp-action="ChangeStatus" asp-route-id="@review.Id" asp-route-status="@ReviewStatus.Draft">Unpublish</a>
             }
         }
+
+        @if (review.Status == ReviewStatus.Published)
+        {
+            @await Component.InvokeAsync("SocialMedia", new { reviewId = @review.Id });
+        }
+            
     </div>
 
     <div>

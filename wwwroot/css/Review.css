@@ -91,3 +91,7 @@
 .ql-clipboard {
     display: none;
 }
+
+#social-media-details {
+    display: flex;
+}

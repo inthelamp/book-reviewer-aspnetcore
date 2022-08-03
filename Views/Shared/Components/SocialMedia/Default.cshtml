@@ -1,0 +1,72 @@
+@model BookReviewer.Models.Review
+
+<link rel="stylesheet" href="~/css/SocialMedia.css" />
+<link rel="stylesheet" href="~/css/font-awesome.min.css" />
+
+<div class="btn-group float-end" role="group">
+    <a id="toTwitter" href="#" onclick="return twitter();" title="Share on Twitter" class="btn btn-social twitter-button" data-title="@Model.Subject" data-tags="BookReviewer"> 
+        <span class="fa fa-twitter"></span>
+    </a>
+    <a id="toFacebook" href="#" onclick="return share(0);" title="Share on Facebook" class="btn btn-social default-button"> 
+        <span class="fa fa-facebook"></span>
+    </a>
+    <a id="toGooglePlus" href="#" onclick="return share(1);" title="Share on Google plus" class="btn btn-social googleplus-button">
+        <span class="fa fa-google-plus"></span>
+    </a>
+    <a id="toReddit" href="#" onclick="return share(2);" title="Share on Reddit" class="btn btn-social reddit-button">
+        <span class="fa fa-reddit-alien"></span>
+    </a>
+    <a id="toLinkedIn" href="#" onclick="return share(3);" title="Share on LinkedIn" class="btn btn-social default-button">
+        <span class="fa fa-linkedin"></span>
+    </a>
+</div>
+
+<!-- Sharing on social media  -->
+<script>
+    var windowFeatures = "width=600,height=460",
+        loc = encodeURIComponent(window.location.href + "/Reviews/Details/@Model.Id?menu=Reviews"),
+        // Sharer URLs
+        tw = "https://twitter.com/share?url=", // Twitter       
+        fb = "https://www.facebook.com/sharer/sharer.php?u=", // Facebook
+        gp = "https://plus.google.com/share?url=", // Google+
+        rd = "http://reddit.com/submit?url=", // Reddit
+        li = "http://www.linkedin.com/shareArticle?mini=true&url=", // LinkedIn
+        // URLs array
+        url = [fb, gp, rd, li];
+
+    function share(i) {
+        "use strict";
+
+        var element = null;
+        switch(i) {
+        case 0:
+            element = document.getElementById('toFacebook');
+            break;
+        case 1:
+            element = document.getElementById('toGooglePlus');
+            break;
+        case 2:
+            element = document.getElementById('toReddit');
+            break;
+        case 3:
+            element = document.getElementById('toLinkedIn');
+            break;            
+        }         
+        var title = element.getAttribute('title');
+        window.open(url[i] + loc, title, windowFeatures);
+
+        return false
+    }
+
+    function twitter() {
+        "use strict";
+        const toTwitter = document.getElementById('toTwitter');
+        var title = toTwitter.getAttribute('title');
+        var text = "text=" + toTwitter.getAttribute('data-title');
+        var hashtags = "hashtags=" + toTwitter.getAttribute('data-tags');
+
+        window.open(tw + loc + "&" + text + "&" + hashtags, title, windowFeatures);
+
+        return false
+    }
+</script>
