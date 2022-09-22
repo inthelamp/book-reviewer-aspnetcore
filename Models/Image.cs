@@ -1,14 +1,12 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Http;  
 
 namespace BookReviewer.Models
 {
     /// <summary>
     /// Properties of image to be uploaded.
     /// </summary>    
-    public class Image
+    public class Image : IBookImage
     {
         public Image ()
         {

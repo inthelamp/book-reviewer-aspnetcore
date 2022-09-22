@@ -3,7 +3,7 @@
 
 <link href="~/lib/quill/quill.snow.css" rel="stylesheet">
 
-@using (Html.BeginForm("SaveDraft","Reviews",FormMethod.Post, new { onsubmit = "return getContent()" }))
+@using (Html.BeginForm("SaveDraft", "Reviews", FormMethod.Post, new { onsubmit = "return getContent()" }))
 {
     <div class="form-group">      
       @Html.Hidden("Content")   

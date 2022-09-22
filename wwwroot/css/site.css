@@ -17,9 +17,8 @@ a.navbar-brand {
     word-break: break-all;
 }
 
-/* Provide sufficient contrast against white background */
 a {
-    color: #0366d6;
+    color: #61dafb;
 }
 
 .btn-primary {
@@ -54,10 +53,6 @@ footer {
 
 .App-body {
     min-height: 70vmin;
-}
-
-.App-link {
-    color: #61dafb;
 }
 
 .App-Buttons {

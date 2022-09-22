@@ -45,6 +45,7 @@ namespace BookReviewer.Models
         public string BookAuthors { get; set; }      
 
         [Display(Name = "ISBN Number")]
+        [StringLength(17)]
         public string IsbnNumber { get; set; }
 
         [Display(Name = "Book Cover")]
